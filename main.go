@@ -50,11 +50,6 @@ func (km *KeyManager) GenerateNewKey() string {
 	}
 	km.available = append(km.available, newKey)
 
-	go func() {
-		time.Sleep(5 * time.Minute)
-		km.DeleteKey(newKey)
-	}()
-
 	return newKey
 }
 
