@@ -165,7 +165,7 @@ func main() {
 	r.GET("/keys", func(c *gin.Context) {
 		key, err := km.RetreiveAvailableKey()
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "No Keys are there"})
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		} else {
 			c.JSON(http.StatusOK, gin.H{"keyId": key})
 		}
@@ -175,7 +175,7 @@ func main() {
 		key := c.Param("id")
 		metadata, err := km.GetKeyInfo(key)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Key is not there"})
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		} else {
 			c.JSON(http.StatusOK, metadata)
 		}
@@ -186,7 +186,7 @@ func main() {
 		key := c.Param("id")
 		err := km.DeleteKey(key)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Key is not there"})
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		} else {
 			c.JSON(http.StatusOK, gin.H{"message": "Key is deleted"})
 		}
@@ -196,7 +196,7 @@ func main() {
 		key := c.Param("id")
 		err := km.UnblockKey(key)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Key is not there"})
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		} else {
 			c.JSON(http.StatusOK, gin.H{"message": "Key is unblocked again"})
 		}
@@ -206,7 +206,7 @@ func main() {
 		key := c.Param("id")
 		err := km.KeepAlive(key)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Key is not there"})
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		} else {
 			c.JSON(http.StatusOK, gin.H{"message": "Key is alive again"})
 		}
