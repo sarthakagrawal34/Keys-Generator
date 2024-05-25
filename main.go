@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -48,6 +49,7 @@ func (km *KeyManager) GenerateNewKey() string {
 		Key:          newKey,
 		CreationTime: time.Now(),
 	}
+	fmt.Println(km.keys[newKey])
 	km.available = append(km.available, newKey)
 
 	return newKey
@@ -97,6 +99,8 @@ func (km *KeyManager) DeleteKey(key string) error {
 	defer km.mu.Unlock()
 
 	delete(km.keys, key)
+	delete(km.blocked, key)
+
 	return nil
 }
 
@@ -117,6 +121,7 @@ func (km *KeyManager) GetKeyInfo(key string) (KeyMetadata, error) {
 	km.mu.Lock()
 	defer km.mu.Unlock()
 
+	fmt.Println(km.keys[key])
 	if metadata, exists := km.keys[key]; exists {
 		return metadata, nil
 	}
@@ -131,10 +136,11 @@ func (km *KeyManager) BackgroundTask() {
 		km.blockMu.Lock()
 
 		for key, blockedTime := range km.blocked {
-			if now.Sub(blockedTime) > 60*time.Second {
+			if now.Sub(blockedTime) > 20*time.Second {
 				metadata := km.keys[key]
 				metadata.IsBlocked = false
 				delete(km.blocked, key)
+				km.keys[key] = metadata
 				km.available = append(km.available, key)
 			}
 		}
@@ -143,7 +149,7 @@ func (km *KeyManager) BackgroundTask() {
 		km.mu.Lock()
 
 		for key, metadata := range km.keys {
-			if now.Sub(metadata.LastAccess) > 5*time.Minute {
+			if now.Sub(metadata.LastAccess) > 1*time.Minute {
 				delete(km.keys, key)
 			}
 		}
