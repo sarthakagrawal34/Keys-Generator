@@ -150,7 +150,7 @@ func (km *KeyManager) BackgroundTask() {
 
 		for key, metadata := range km.keys {
 			if now.Sub(metadata.LastAccess) > 1*time.Minute {
-				delete(km.keys, key)
+				km.DeleteKey(key)
 			}
 		}
 		km.mu.Unlock()
